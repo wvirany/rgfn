@@ -1,0 +1,17 @@
+include 'configs/scent_base.gin'
+include 'configs/bo/bo_base.gin'
+include 'configs/envs/settings/small.gin'
+include 'configs/proxies/target/seh.gin'
+
+device = 'cpu'
+
+# Trainer settings
+Trainer.n_iterations = 1
+Trainer.train_forward_n_trajectories = 4
+Trainer.train_batch_size = 4
+
+# BO settings
+BOLoop.n_bo_iterations = 3
+BOLoop.initial_samples = 5
+BOLoop.candidates_per_iteration = 10
+BOLoop.top_k = 5

@@ -109,6 +109,35 @@ python train.py --cfg configs/scent_seh_proxy.gin
 The script will dump the results under `experiments/scent_seh_proxy/<timestamp>` directory. Our code uses gin-config
 package that allows for lightweight models configuration along with dependency injection.
 
+## Bayesian optimization
+
+SCENT can be trained using a Bayesian optimiztion (BO) loop. This is implemented as follows:
+```
+1. Initialize dataset with N molecules (default N = 500)
+2. Repeat until convergence (e.g., fixed number of BO iterations; default T = 20):
+  - Train surrogate model on dataset
+  - Train SCENT using the UCB acquisition function as the reward
+  - After training SCENT, sample M molecules from trained policy (default M = 1000)
+  - From the M molecules, choose the top K according to the surrogate model (default K = 500)
+  - Evaluate these K molecules on the true oracle
+```
+
+Initial N molecules are sampled using a uniform forward policy for a "warm start". Hyperparameters for the BO loop, acquistion function, and GP surrogate can be set in `configs/bo/bo_base.gin`.
+
+This requires the following additional dependencies:
+```bash
+pip install gauche gpytorch
+```
+
+To run:
+```bash
+python run_bo.py --cfg configs/bo/bo_base.gin
+```
+
+The BO loop saves the acquired SMILES strings and corresponding oracle scores to CSV file. Results are saved depending on the name of the config file: for example, the above command would save results to `experiments/bo/bo_base/results.csv`, and the corresponding SCENT experiment directory is `experiments/bo/bo_base/{timestamp}`.
+
+Note that each BO run overwrites the results for the previous timestamps corresponding to the same config.
+
 ## Building Blocks Library
 
 Configuration files for the SMALL, MEDIUM, and LARGE settings are available in `configs/envs/settings`. The building block superset used in the MEDIUM and LARGE settings can be requested from [Enamine](https://enamine.net/building-blocks/building-blocks-catalog). The `small_extended.gin` configuration file defines the SMALL setting with additional support for 3- and 4-ary reaction templates.

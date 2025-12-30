@@ -1,0 +1,65 @@
+include 'configs/scent_seh_proxy.gin'
+
+device = 'cuda'     # Trainer and GP device must be the same
+
+# Hyperparameters
+beta = 16
+beta_2 = 1.0
+
+# GP settings
+GPSurrogate.training_iter = 100
+GPSurrogate.device = %device
+
+# GP instantiation
+gp_surrogate/gin.singleton.constructor = @GPSurrogate
+gp_surrogate = @gp_surrogate/gin.singleton()
+
+# Acquisition proxy settings
+AcquisitionProxy.beta_1 = %beta
+AcquisitionProxy.beta_2 = %beta_2
+AcquisitionProxy.gp_surrogate = %gp_surrogate
+
+# Acquisition proxy instantiation
+acquisition_proxy/gin.singleton.constructor = @AcquisitionProxy
+acquisition_proxy = @acquisition_proxy/gin.singleton()
+train_proxy = %acquisition_proxy
+
+train_metrics = [
+    @StandardGFNMetrics(),
+    @ActionSpaceSize(),
+    @QED(),
+    @FractionEarlyTerminate(),
+    @AcquisitionOracleComparison(),
+    @NumReactions(),
+    @SaveSynthesisPaths(),
+    @NumScaffoldsFound(),
+]
+AcquisitionOracleComparison.gp_surrogate = %gp_surrogate
+TopKProxyMetric.include_all_components = False
+
+# Trainer settings
+Trainer.device = %device
+Trainer.n_iterations = 200
+Trainer.train_forward_n_trajectories = 32
+Trainer.train_batch_size = 32
+Trainer.valid_sampler = None    # No validation for BO
+Trainer.checkpoint_mode = "none"
+Trainer.resume_path = None
+
+# Trainer instantiation
+trainer/gin.singleton.constructor = @Trainer
+trainer = @trainer/gin.singleton()
+
+# BO objects
+BOLoop.trainer = %trainer
+BOLoop.acquisition_proxy = %acquisition_proxy
+
+# BO settings
+BOLoop.n_bo_iterations = 19
+BOLoop.initial_samples = 50
+BOLoop.candidates_per_iteration = 1000
+BOLoop.top_k = 500
+BOLoop.verbose = True
+BOLoop.beta = %beta_2
+BOLoop.beta_schedule = "constant"
+BOLoop.beta_threshold = None

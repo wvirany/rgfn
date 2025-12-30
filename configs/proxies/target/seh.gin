@@ -1,3 +1,13 @@
 proxy/gin.singleton.constructor = @SehMoleculeProxy
 train_proxy = @proxy/gin.singleton()
 valid_proxy = %train_proxy
+
+oracle_proxy/gin.singleton.constructor = @SehMoleculeProxy
+train_proxy = @oracle_proxy/gin.singleton()
+
+# BO proxy settings, train proxy is overridden in bo_base.gin
+oracle_proxy = @oracle_proxy/gin.singleton()
+valid_proxy = %oracle_proxy
+
+BOLoop.oracle_proxy = %oracle_proxy
+AcquisitionOracleComparison.oracle_proxy = %oracle_proxy
