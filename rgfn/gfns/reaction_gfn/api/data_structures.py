@@ -81,7 +81,7 @@ class Reaction:
         reaction = f"{left} >> {right}"
         rxn = AllChem.ReactionFromSmarts(reaction)
         if rxn is None:
-            raise ValueError(f"Invalid reaction SMILES: {self.reaction}")
+            raise ValueError(f"Invalid reaction SMARTS: {self.reaction}")
         left_side_rdkit_patterns = tuple(Pattern(p) for p in left.split("."))
         object.__setattr__(self, "reaction", reaction)
         object.__setattr__(self, "rdkit_rxn", rxn)

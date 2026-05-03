@@ -35,13 +35,14 @@ class WandbLogger(LoggerBase):
         self.run = self._init_run()
 
     def _init_run(self):
-        group_list = self.experiment_name.split("/")
-        group = "/".join(group_list[:-1])
+        if "group" not in self.kwargs:
+            group_list = self.experiment_name.split("/")
+            group = "/".join(group_list[:-1])
+            self.kwargs["group"] = group
         return wandb.init(
             dir=self.logdir,
             project=self.project_name,
             name=self.experiment_name,
-            group=group,
             **self.kwargs,
         )
 

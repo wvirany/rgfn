@@ -274,6 +274,8 @@ class Trainer(Generic[TState, TActionSpace, TAction], TrainingHooksMixin):
         Returns:
             None
         """
+        if self.checkpoint_mode == "none":
+            return
         checkpoint_dir = self.run_dir / "train" / "checkpoints"
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
         metrics = {k: v for k, v in metrics.items() if isinstance(v, (float, int))}
@@ -298,7 +300,7 @@ class Trainer(Generic[TState, TActionSpace, TAction], TrainingHooksMixin):
         Returns:
             a dictionary containing the best validation metrics.
         """
-        for i in (pbar := tqdm(range(self.start_iteration, self.n_iterations))):
+        for i in (pbar := tqdm(range(self.start_iteration, self.n_iterations), position=1, leave=False)):
             if i % 100 == 0:
                 gc.collect()
                 torch.cuda.empty_cache()

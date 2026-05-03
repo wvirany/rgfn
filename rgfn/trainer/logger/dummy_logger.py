@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import gin
 
@@ -22,6 +22,9 @@ class DummyLogger(LoggerBase):
         pass
 
     def log_to_file(self, content: Any, name: str, type: str = "txt"):
+        pass
+
+    def log_files(self, file_paths: List[Path | str]):
         pass
 
     def log_config(self, config: Dict[str, Any]):

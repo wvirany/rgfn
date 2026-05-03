@@ -15,3 +15,8 @@ BOLoop.n_bo_iterations = 3
 BOLoop.initial_samples = 5
 BOLoop.candidates_per_iteration = 10
 BOLoop.top_k = 5
+
+# Wandb settings
+WandbLogger.project_name = 'rgfn'
+WandbLogger.group = 'bo_test'
+WandbLogger.tags = ['scent', 'bo', 'test']
